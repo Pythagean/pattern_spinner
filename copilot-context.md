@@ -22,6 +22,7 @@ The app will be hosted on GitHub Pages.
 - Responsive design (mobile and desktop)
 - Clear typography with good contrast
 - Smooth, simple animations for interactions
+- Do not touch the text element in Wheel.tsx
 
 ## Example patterns list
 - Chon-Ji

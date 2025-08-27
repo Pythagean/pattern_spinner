@@ -21,7 +21,7 @@ const App: React.FC = () => {
     setTimeout(() => {
       setCurrent(getRandomPattern(current));
       setSpinning(false);
-    }, 900); // simple spin delay
+    }, 100); // simple spin delay
   };
 
   return (
