@@ -14,7 +14,7 @@ function getDanStyle(pattern: string): { fill: string; stripes?: number } | unde
     if (!danMatch) return undefined;
     // Map pattern to Dan number
     const danMap: Record<string, number> = {
-        "Kwang-Gae": 1, "Po-Eun": 1, "Gae-Baek": 1,
+        "Kwang-Gae": 1, "Po-Eun": 1, "Ge-Baek": 1,
         "Eui-Am": 2, "Choong-Jang": 2, "Juche": 2,
         "Sam-Il": 3, "Yoo-Sin": 3, "Choi-Yong": 3,
         "Yong-Gae": 4, "Ul-Ji": 4, "Moon-Moo": 4,
@@ -38,7 +38,7 @@ const patternStyles: Record<string, { fill: string; stripe?: string; stripes?: n
     "Choong-Moo": { fill: "#ff3f3fff", stripe: "#222" }, // red with black stripe
     "Kwang-Gae": { fill: "#222", stripes: 1 }, // black with yellow stripe
     "Po-Eun": { fill: "#222", stripes: 1 },
-    "Gae-Baek": { fill: "#222", stripes: 1 },
+    "Ge-Baek": { fill: "#222", stripes: 1 },
     // Dan patterns (2nd Dan and above)
     "Eui-Am": { fill: "#222", stripes: 2 },
     "Choong-Jang": { fill: "#222", stripes: 2 },

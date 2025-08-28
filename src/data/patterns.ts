@@ -11,7 +11,7 @@ export const patterns = [
   { name: "Choong-Moo", rank: "1st Gup (Black Stripe)" },
   { name: "Kwang-Gae", rank: "1st Dan" },
   { name: "Po-Eun", rank: "1st Dan" },
-  { name: "Gae-Baek", rank: "1st Dan" },
+  { name: "Ge-Baek", rank: "1st Dan" },
   { name: "Eui-Am", rank: "2nd Dan" },
   { name: "Choong-Jang", rank: "2nd Dan" },
   { name: "Juche", rank: "2nd Dan" },
