@@ -8,8 +8,25 @@ type WheelProps = {
     usedPatterns?: string[];
 };
 
-// Custom color and stripe map for each pattern
-const patternStyles: Record<string, { fill: string; stripe?: string }> = {
+// Helper to generate Dan pattern styles
+function getDanStyle(pattern: string): { fill: string; stripes?: number } | undefined {
+    const danMatch = pattern.match(/^(Eui-Am|Choong-Jang|Juche|Sam-Il|Yoo-Sin|Choi-Yong|Yong-Gae|Ul-Ji|Moon-Moo|So-San|Se-Jong|Tong-Il)$/);
+    if (!danMatch) return undefined;
+    // Map pattern to Dan number
+    const danMap: Record<string, number> = {
+        "Kwang-Gae": 1, "Po-Eun": 1, "Gae-Baek": 1,
+        "Eui-Am": 2, "Choong-Jang": 2, "Juche": 2,
+        "Sam-Il": 3, "Yoo-Sin": 3, "Choi-Yong": 3,
+        "Yong-Gae": 4, "Ul-Ji": 4, "Moon-Moo": 4,
+        "So-San": 5, "Se-Jong": 5,
+        "Tong-Il": 6
+    };
+    const dan = danMap[pattern];
+    if (!dan) return undefined;
+    return { fill: "#222", stripes: dan };
+}
+
+const patternStyles: Record<string, { fill: string; stripe?: string; stripes?: number }> = {
     "Chon-Ji": { fill: "#fff", stripe: "#ffd93fff" }, // white with yellow stripe
     "Dan-Gun": { fill: "#ffd93fff" }, // yellow
     "Do-San": { fill: "#ffd93fff", stripe: "#3b9b3cff" }, // yellow with green stripe
@@ -19,9 +36,22 @@ const patternStyles: Record<string, { fill: string; stripe?: string }> = {
     "Toi-Gye": { fill: "#3c64f4ff", stripe: "#ff3f3fff" }, // blue with red stripe
     "Hwa-Rang": { fill: "#ff3f3fff" }, // red
     "Choong-Moo": { fill: "#ff3f3fff", stripe: "#222" }, // red with black stripe
-    "Kwang-Gae": { fill: "#222", stripe: "#ffd93fff" }, // black with yellow stripe
-    "Po-Eun": { fill: "#222", stripe: "#ffd93fff" },
-    "Gae-Baek": { fill: "#222", stripe: "#ffd93fff" },
+    "Kwang-Gae": { fill: "#222", stripes: 1 }, // black with yellow stripe
+    "Po-Eun": { fill: "#222", stripes: 1 },
+    "Gae-Baek": { fill: "#222", stripes: 1 },
+    // Dan patterns (2nd Dan and above)
+    "Eui-Am": { fill: "#222", stripes: 2 },
+    "Choong-Jang": { fill: "#222", stripes: 2 },
+    "Juche": { fill: "#222", stripes: 2 },
+    "Sam-Il": { fill: "#222", stripes: 3 },
+    "Yoo-Sin": { fill: "#222", stripes: 3 },
+    "Choi-Yong": { fill: "#222", stripes: 3 },
+    "Yong-Gae": { fill: "#222", stripes: 4 },
+    "Ul-Ji": { fill: "#222", stripes: 4 },
+    "Moon-Moo": { fill: "#222", stripes: 4 },
+    "So-San": { fill: "#222", stripes: 5 },
+    "Se-Jong": { fill: "#222", stripes: 5 },
+    "Tong-Il": { fill: "#222", stripes: 6 },
 };
 
 function getSlicePath(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
@@ -69,7 +99,12 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 
                 {patterns.map((pattern, i) => {
                     const startAngle = i * angle - 90;
                     const endAngle = (i + 1) * angle - 90;
-                    const style = patternStyles[pattern] || { fill: "#888" };
+                    let style = patternStyles[pattern] || { fill: "#888" };
+                    // For Dan patterns, use stripes property
+                    if (style.stripes) {
+                        // Render multiple yellow stripes for Dan patterns
+                        style = { ...style };
+                    }
                     const midAngle = ((startAngle + endAngle) / 2) * Math.PI / 180;
                     const isUsed = usedPatterns.includes(pattern);
                     const isSelected = !spinning && pattern === selected;
@@ -82,10 +117,37 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 
                                 strokeWidth={1}
                                 opacity={isUsed ? 0.7 : 1}
                             />
-                            {style.stripe && !isUsed && (() => {
-                                // Stripe as a band across the wedge at its midpoint (like a belt)
-                                const bandRadius = r * 0.5; // move band further inward
-                                const bandThickness = 36; // width of the band
+                            {/* Render stripes for Dan patterns */}
+                            {style.stripes && !isUsed && Array.from({ length: style.stripes }).map((_, idx) => {
+                                // Add a small gap between Dan stripes
+                                const bandRadius = r * (0.42 + 0.11 * idx);
+                                const bandThickness = 16;
+                                const angle1 = startAngle;
+                                const angle2 = endAngle;
+                                // Outer points (band outer edge)
+                                const x1 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
+                                const y1 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
+                                const x2 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
+                                const y2 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
+                                // Inner points (band inner edge)
+                                const x3 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
+                                const y3 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
+                                const x4 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
+                                const y4 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
+                                return (
+                                    <polygon
+                                        key={idx}
+                                        points={`${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}`}
+                                        fill="#ffd93fff"
+                                        style={{ filter: "drop-shadow(0 0 2px #fff8)" }}
+                                    />
+                                );
+                            })}
+                            {/* Render single stripe for non-Dan patterns */}
+                            {style.stripe && !isUsed && !style.stripes && (() => {
+                                // Align non-Dan pattern stripes to match the innermost Dan stripe
+                                const bandRadius = r * 0.42; // same as innermost Dan stripe
+                                const bandThickness = 16; // same as Dan stripe thickness
                                 const angle1 = startAngle;
                                 const angle2 = endAngle;
                                 // Outer points (band outer edge)

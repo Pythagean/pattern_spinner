@@ -4,20 +4,59 @@ import React, { useState } from "react";
 import PatternCard from "./components/PatternCard";
 import Spinner from "./components/Spinner";
 import Wheel from "./components/Wheel";
-import { patterns } from "./data/patterns";
+import { patterns as allPatterns } from "./data/patterns";
 
+
+const getRankOrder = (rank: string): number => {
+  // Lower number = lower rank
+  const order = [
+    "9th Gup (Yellow Stripe)",
+    "8th Gup (Yellow Belt)",
+    "7th Gup (Green Stripe)",
+    "6th Gup (Green Belt)",
+    "5th Gup (Blue Stripe)",
+    "4th Gup (Blue Belt)",
+    "3rd Gup (Red Stripe)",
+    "2nd Gup (Red Belt)",
+    "1st Gup (Black Stripe)",
+    "1st Dan",
+    "2nd Dan",
+    "3rd Dan",
+    "4th Dan",
+    "5th Dan",
+    "6th Dan"
+  ];
+  return order.indexOf(rank);
+};
+
+const uniqueRanks = Array.from(new Set(allPatterns.map(p => p.rank)));
 
 const App: React.FC = () => {
-  const [current, setCurrent] = useState<string>(patterns[0]);
+  const [selectedRank, setSelectedRank] = useState<string>(uniqueRanks.includes("1st Dan") ? "1st Dan" : uniqueRanks[0]);
   const [spinning, setSpinning] = useState(false);
   const [next, setNext] = useState<string | null>(null);
   const [spinVariance, setSpinVariance] = useState<number>(0);
   const [usedPatterns, setUsedPatterns] = useState<string[]>([]);
   const [hasSpun, setHasSpun] = useState(false);
 
+  // Patterns available for this rank and below
+  const patterns = allPatterns.filter(
+    p => getRankOrder(p.rank) <= getRankOrder(selectedRank)
+  );
+  // Use pattern names for selection logic
+  const patternNames = patterns.map(p => p.name);
+
+  const [current, setCurrent] = useState<string>(patternNames[0]);
+
+  React.useEffect(() => {
+    // Reset current if rank changes
+    setCurrent(patternNames[0]);
+    setUsedPatterns([]);
+    setHasSpun(false);
+  }, [selectedRank]);
+
   const handleSpin = () => {
     if (hasSpun) {
-      // On spin, mark the current pattern as used (unless it's already used)
       setUsedPatterns((prev) => {
         if (!prev.includes(current)) {
           return [...prev, current];
@@ -27,12 +66,11 @@ const App: React.FC = () => {
     }
     setHasSpun(true);
     // Exclude already used patterns
-    const available = patterns.filter((p) => !usedPatterns.includes(p) && p !== current);
-    if (available.length === 0) return; // No more patterns to spin
+    const available = patternNames.filter((p) => !usedPatterns.includes(p) && p !== current);
+    if (available.length === 0) return;
     const newPattern = available[Math.floor(Math.random() * available.length)];
-    // Add variance: random offset within the wedge (-angle/2 to +angle/2)
-    const angle = 360 / patterns.length;
-    const variance = (Math.random() - 0.5) * angle * 0.9; // 90% of wedge width, centered
+    const angle = 360 / patternNames.length;
+    const variance = (Math.random() - 0.5) * angle * 0.9;
     setSpinVariance(variance);
     setNext(newPattern);
     setSpinning(true);
@@ -40,8 +78,7 @@ const App: React.FC = () => {
       setCurrent(newPattern);
       setSpinning(false);
       setNext(null);
-      // Do not reset spinVariance here; keep it until next spin
-    }, 2000); // match spin animation duration
+    }, 2000);
   };
 
   const handleReset = () => {
@@ -53,7 +90,21 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <h1 className="text-3xl font-bold mb-8 text-gray-800">Taekwondo Pattern Spinner</h1>
-      <Wheel patterns={patterns} selected={spinning && next ? next : current} spinning={spinning} variance={spinVariance} usedPatterns={usedPatterns} />
+      <div className="mb-4">
+        <label htmlFor="rank-select" className="mr-2 font-semibold">Select your rank:</label>
+        <select
+          id="rank-select"
+          value={selectedRank}
+          onChange={e => setSelectedRank(e.target.value)}
+          className="p-2 rounded border border-gray-300"
+          disabled={spinning}
+        >
+          {uniqueRanks.map(rank => (
+            <option key={rank} value={rank}>{rank}</option>
+          ))}
+        </select>
+      </div>
+      <Wheel patterns={patternNames} selected={spinning && next ? next : current} spinning={spinning} variance={spinVariance} usedPatterns={usedPatterns} />
       <PatternCard pattern={spinning ? "Spinning..." : current} />
       <Spinner onSpin={handleSpin} spinning={spinning} />
       <button
