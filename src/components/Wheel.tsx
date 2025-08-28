@@ -5,6 +5,7 @@ type WheelProps = {
     selected: string;
     spinning: boolean;
     variance?: number;
+    usedPatterns?: string[];
 };
 
 // Custom color and stripe map for each pattern
@@ -38,7 +39,7 @@ function getSlicePath(cx: number, cy: number, r: number, startAngle: number, end
     ].join(" ");
 }
 
-const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 0 }) => {
+const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 0, usedPatterns = [] }) => {
     const segCount = patterns.length;
     const angle = 360 / segCount;
     const selectedIdx = patterns.indexOf(selected);
@@ -60,7 +61,7 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 
                 width={size}
                 height={size}
                 viewBox={`0 0 ${size} ${size}`}
-                className={`rounded-full border-4 border-gray-300 shadow-lg ${spinning ? "transition-transform duration-[2000ms] ease-out" : ""}`}
+                className={`rounded-full border-4 border-gray-300 shadow-lg ${spinning ? "transition-transform duration-[2000ms] [transition-timing-function:cubic-bezier(0.15,0.85,0.25,1)]" : ""}`}
                 style={{
                     transform: `rotate(${rotation}deg)`
                 }}
@@ -70,48 +71,57 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 
                     const endAngle = (i + 1) * angle - 90;
                     const style = patternStyles[pattern] || { fill: "#888" };
                     const midAngle = ((startAngle + endAngle) / 2) * Math.PI / 180;
+                    const isUsed = usedPatterns.includes(pattern);
+                    const isSelected = !spinning && pattern === selected;
                     return (
                         <g key={pattern}>
                             <path
                                 d={getSlicePath(cx, cy, r, startAngle, endAngle)}
-                                fill={style.fill}
+                                fill={isUsed ? "#bbb" : style.fill}
                                 stroke="#ffffffff"
                                 strokeWidth={1}
+                                opacity={isUsed ? 0.7 : 1}
                             />
-                                                {style.stripe && (() => {
-                                                    // Stripe as a band across the wedge at its midpoint (like a belt)
-                                                    const bandRadius = r * 0.5; // move band further inward
-                                                    const bandThickness = 36; // width of the band
-                                                    const angle1 = startAngle;
-                                                    const angle2 = endAngle;
-                                                    // Outer points (band outer edge)
-                                                    const x1 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
-                                                    const y1 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
-                                                    const x2 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
-                                                    const y2 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
-                                                    // Inner points (band inner edge)
-                                                    const x3 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
-                                                    const y3 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
-                                                    const x4 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
-                                                    const y4 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
-                                                    return (
-                                                        <polygon
-                                                            points={`${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}`}
-                                                            fill={style.stripe}
-                                                            style={{ filter: "drop-shadow(0 0 2px #fff8)" }}
-                                                        />
-                                                    );
-                                                })()}
+                            {style.stripe && !isUsed && (() => {
+                                // Stripe as a band across the wedge at its midpoint (like a belt)
+                                const bandRadius = r * 0.5; // move band further inward
+                                const bandThickness = 36; // width of the band
+                                const angle1 = startAngle;
+                                const angle2 = endAngle;
+                                // Outer points (band outer edge)
+                                const x1 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
+                                const y1 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
+                                const x2 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
+                                const y2 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
+                                // Inner points (band inner edge)
+                                const x3 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
+                                const y3 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
+                                const x4 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
+                                const y4 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
+                                return (
+                                    <polygon
+                                        points={`${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}`}
+                                        fill={style.stripe}
+                                        style={{ filter: "drop-shadow(0 0 2px #fff8)" }}
+                                    />
+                                );
+                            })()}
                             <text
                                 x={cx + (r / 2) * Math.cos(midAngle) - 90}
                                 y={cy + (r / 2) * Math.sin(midAngle)}
                                 textAnchor="start"
                                 dominantBaseline="middle"
-                                fontSize={16}
-                                                                fill={
-                                                                    (style.fill === "#ffd93fff" || style.fill === "#fff") ? "#2d2d2dff" : "#fff"
-                                                                }
-                                fontWeight="bold"
+                                fontSize={isSelected ? 20 : 16}
+                                fill={
+                                    isSelected
+                                        ? (style.fill === "#ff3f3fff" ? "#ffd93fff" : "#ef4444")
+                                        : isUsed
+                                            ? "#888"
+                                            : (style.fill === "#ffd93fff" || style.fill === "#fff")
+                                                ? "#2d2d2dff"
+                                                : "#fff"
+                                }
+                                fontWeight={isSelected ? "bolder" : "bold"}
                                 transform={`rotate(${((startAngle + endAngle) / 2 + 180)},${cx + (r / 2) * Math.cos(midAngle)},${cy + (r / 2) * Math.sin(midAngle)})`}
                                 style={{ userSelect: "none", pointerEvents: "none", textShadow: "0 1px 1px rgba(125, 125, 125, 0.53)" }}
                             >
