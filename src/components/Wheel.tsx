@@ -4,6 +4,7 @@ type WheelProps = {
     patterns: string[];
     selected: string;
     spinning: boolean;
+    variance?: number;
 };
 
 // Custom color and stripe map for each pattern
@@ -37,7 +38,7 @@ function getSlicePath(cx: number, cy: number, r: number, startAngle: number, end
     ].join(" ");
 }
 
-const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
+const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 0 }) => {
     const segCount = patterns.length;
     const angle = 360 / segCount;
     const selectedIdx = patterns.indexOf(selected);
@@ -45,8 +46,8 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
     // The leftmost point is at -90 - 90 = -180 degrees from SVG 0 (right)
     const leftAlignAngle = -90;
     const rotation = spinning
-        ? 2160 + (leftAlignAngle - selectedIdx * angle - angle / 2)
-        : leftAlignAngle - selectedIdx * angle - angle / 2;
+        ? 2160 + (leftAlignAngle - selectedIdx * angle - angle / 2 + variance)
+        : leftAlignAngle - selectedIdx * angle - angle / 2 + variance;
 
     const size = 440;
     const r = size / 2 - 12;
