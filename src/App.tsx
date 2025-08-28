@@ -6,11 +6,6 @@ import Spinner from "./components/Spinner";
 import Wheel from "./components/Wheel";
 import { patterns } from "./data/patterns";
 
-const getRandomPattern = (exclude?: string) => {
-  let filtered = patterns;
-  if (exclude) filtered = patterns.filter((p) => p !== exclude);
-  return filtered[Math.floor(Math.random() * filtered.length)];
-};
 
 const App: React.FC = () => {
   const [current, setCurrent] = useState<string>(patterns[0]);
