@@ -71,11 +71,11 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
                             <path
                                 d={getSlicePath(cx, cy, r, startAngle, endAngle)}
                                 fill={style.fill}
-                                stroke="#fff"
-                                strokeWidth={2}
+                                stroke="#ffffffff"
+                                strokeWidth={1}
                             />
                             {style.stripe && (() => {
-                                const stripeWidth = 36; // wider stripe
+                                const stripeWidth = 30; // wider stripe
                                 const angle1 = ((startAngle + endAngle) / 2) - (stripeWidth / r) * 180 / Math.PI / 2;
                                 const angle2 = ((startAngle + endAngle) / 2) + (stripeWidth / r) * 180 / Math.PI / 2;
                                 // Expand to the very edge
@@ -87,7 +87,6 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
                                     <polygon
                                         points={`${x1},${y1} ${x2},${y2} ${cx},${cy}`}
                                         fill={style.stripe}
-                                        style={{ filter: "drop-shadow(0 0 2px #fff8)" }}
                                     />
                                 );
                             })()}

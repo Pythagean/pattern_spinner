@@ -32,7 +32,7 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <h1 className="text-3xl font-bold mb-8 text-gray-800">Taekwondo Pattern Spinner</h1>
   <Wheel patterns={patterns} selected={spinning && next ? next : current} spinning={spinning} />
-      <PatternCard pattern={current} />
+  <PatternCard pattern={spinning ? "Spinning..." : current} />
       <Spinner onSpin={handleSpin} spinning={spinning} />
       <p className="mt-8 text-gray-500 text-sm">Click Spin to get a random pattern for practice.</p>
     </div>
