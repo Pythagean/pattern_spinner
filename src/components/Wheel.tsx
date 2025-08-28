@@ -74,22 +74,30 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
                                 stroke="#ffffffff"
                                 strokeWidth={1}
                             />
-                            {style.stripe && (() => {
-                                const stripeWidth = 30; // wider stripe
-                                const angle1 = ((startAngle + endAngle) / 2) - (stripeWidth / r) * 180 / Math.PI / 2;
-                                const angle2 = ((startAngle + endAngle) / 2) + (stripeWidth / r) * 180 / Math.PI / 2;
-                                // Expand to the very edge
-                                const x1 = cx + r * Math.cos(angle1 * Math.PI / 180);
-                                const y1 = cy + r * Math.sin(angle1 * Math.PI / 180);
-                                const x2 = cx + r * Math.cos(angle2 * Math.PI / 180);
-                                const y2 = cy + r * Math.sin(angle2 * Math.PI / 180);
-                                return (
-                                    <polygon
-                                        points={`${x1},${y1} ${x2},${y2} ${cx},${cy}`}
-                                        fill={style.stripe}
-                                    />
-                                );
-                            })()}
+                                                {style.stripe && (() => {
+                                                    // Stripe as a band across the wedge at its midpoint (like a belt)
+                                                    const bandRadius = r * 0.6; // center of the band
+                                                    const bandThickness = 36; // width of the band
+                                                    const angle1 = startAngle;
+                                                    const angle2 = endAngle;
+                                                    // Outer points (band outer edge)
+                                                    const x1 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
+                                                    const y1 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
+                                                    const x2 = cx + (bandRadius + bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
+                                                    const y2 = cy + (bandRadius + bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
+                                                    // Inner points (band inner edge)
+                                                    const x3 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle2 * Math.PI / 180);
+                                                    const y3 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle2 * Math.PI / 180);
+                                                    const x4 = cx + (bandRadius - bandThickness / 2) * Math.cos(angle1 * Math.PI / 180);
+                                                    const y4 = cy + (bandRadius - bandThickness / 2) * Math.sin(angle1 * Math.PI / 180);
+                                                    return (
+                                                        <polygon
+                                                            points={`${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}`}
+                                                            fill={style.stripe}
+                                                            style={{ filter: "drop-shadow(0 0 2px #fff8)" }}
+                                                        />
+                                                    );
+                                                })()}
                             <text
                                 x={cx + (r / 2) * Math.cos(midAngle) - 90}
                                 y={cy + (r / 2) * Math.sin(midAngle)}
