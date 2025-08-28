@@ -9,22 +9,6 @@ type WheelProps = {
 };
 
 // Helper to generate Dan pattern styles
-function getDanStyle(pattern: string): { fill: string; stripes?: number } | undefined {
-    const danMatch = pattern.match(/^(Eui-Am|Choong-Jang|Juche|Sam-Il|Yoo-Sin|Choi-Yong|Yong-Gae|Ul-Ji|Moon-Moo|So-San|Se-Jong|Tong-Il)$/);
-    if (!danMatch) return undefined;
-    // Map pattern to Dan number
-    const danMap: Record<string, number> = {
-        "Kwang-Gae": 1, "Po-Eun": 1, "Ge-Baek": 1,
-        "Eui-Am": 2, "Choong-Jang": 2, "Juche": 2,
-        "Sam-Il": 3, "Yoo-Sin": 3, "Choi-Yong": 3,
-        "Yong-Gae": 4, "Ul-Ji": 4, "Moon-Moo": 4,
-        "So-San": 5, "Se-Jong": 5,
-        "Tong-Il": 6
-    };
-    const dan = danMap[pattern];
-    if (!dan) return undefined;
-    return { fill: "#222", stripes: dan };
-}
 
 const patternStyles: Record<string, { fill: string; stripe?: string; stripes?: number }> = {
     "Chon-Ji": { fill: "#fff", stripe: "#ffd93fff" }, // white with yellow stripe
