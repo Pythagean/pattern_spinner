@@ -49,6 +49,9 @@ App.jsx
 main.jsx
 
 ## Future Ideas
+- Sidepanel with number of moves in pattern, and the meaning
+- List of movements from encylopedia
+- Tips
 - Track practice history and show most/least practiced patterns
 - Add sound effects for the spin
 - Allow users to mark certain patterns as "favorites"
