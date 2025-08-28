@@ -41,9 +41,12 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
     const segCount = patterns.length;
     const angle = 360 / segCount;
     const selectedIdx = patterns.indexOf(selected);
+    // To align the selected pattern to the left (SVG -180deg), account for the -90deg offset in wedge drawing
+    // The leftmost point is at -90 - 90 = -180 degrees from SVG 0 (right)
+    const leftAlignAngle = -90;
     const rotation = spinning
-        ? 2160 + (360 - selectedIdx * angle - angle / 2) // 6 full spins
-        : 360 - selectedIdx * angle - angle / 2;
+        ? 2160 + (leftAlignAngle - selectedIdx * angle - angle / 2)
+        : leftAlignAngle - selectedIdx * angle - angle / 2;
 
     const size = 440;
     const r = size / 2 - 12;
@@ -76,7 +79,7 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
                             />
                                                 {style.stripe && (() => {
                                                     // Stripe as a band across the wedge at its midpoint (like a belt)
-                                                    const bandRadius = r * 0.6; // center of the band
+                                                    const bandRadius = r * 0.5; // move band further inward
                                                     const bandThickness = 36; // width of the band
                                                     const angle1 = startAngle;
                                                     const angle2 = endAngle;
@@ -104,9 +107,9 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
                                 textAnchor="start"
                                 dominantBaseline="middle"
                                 fontSize={16}
-                                fill={
-                                    (style.fill === "#ffd93fff" || style.stripe === "#ffd93fff") ? "#2d2d2dff" : "#fff"
-                                }
+                                                                fill={
+                                                                    (style.fill === "#ffd93fff" || style.fill === "#fff") ? "#2d2d2dff" : "#fff"
+                                                                }
                                 fontWeight="bold"
                                 transform={`rotate(${((startAngle + endAngle) / 2 + 180)},${cx + (r / 2) * Math.cos(midAngle)},${cy + (r / 2) * Math.sin(midAngle)})`}
                                 style={{ userSelect: "none", pointerEvents: "none", textShadow: "0 1px 1px rgba(125, 125, 125, 0.53)" }}
@@ -127,8 +130,21 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning }) => {
                     style={{ pointerEvents: "none" }}
                 />
             </svg>
-            {/* Pointer */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-16 border-l-transparent border-r-transparent border-b-red-500" />
+            {/* Left-edge selector pointer (triangle) */}
+            <svg
+                width={32}
+                height={64}
+                style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)" }}
+                pointerEvents="none"
+            >
+                <polygon
+                    points="32,32 0,16 0,48"
+                    fill="#ef4444" // Tailwind red-500
+                    stroke="#fff"
+                    strokeWidth={2}
+                    filter="drop-shadow(0 1px 2px #0006)"
+                />
+            </svg>
         </div>
     );
 };
