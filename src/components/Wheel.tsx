@@ -70,12 +70,12 @@ const Wheel: React.FC<WheelProps> = ({ patterns, selected, spinning, variance = 
     const cy = size / 2;
 
     return (
-        <div className="relative flex items-center justify-center my-8">
+    <div className="relative flex items-center justify-center my-8 overflow-x-auto pr-6">
             <svg
                 width={size}
                 height={size}
                 viewBox={`0 0 ${size} ${size}`}
-                className={`rounded-full border-4 border-gray-300 shadow-lg ${spinning ? "transition-transform duration-[2000ms] [transition-timing-function:cubic-bezier(0.15,0.85,0.25,1)]" : ""}`}
+                className={`rounded-full border-4 border-gray-300 shadow-lg ${spinning ? "transition-transform duration-[2000ms] [transition-timing-function:cubic-bezier(0.15,0.85,0.25,1)]" : ""} w-[90vw] max-w-[320px] h-auto md:w-[440px] md:max-w-[440px]`}
                 style={{
                     transform: `rotate(${rotation}deg)`
                 }}
